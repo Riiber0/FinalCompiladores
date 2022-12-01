@@ -17,7 +17,7 @@
 DIGIT [0-9]
 LETRA [a-zA-Z]
 KEYWORDS else|if|int|return|void|while
-OPCOMPLEX \<\=|\>\=
+OPCOMPLEX <=|>=|==|!=
 OPSIMPLE \+|\-|\*|\/|\<|\>|\=|;|,|\(|\)|\[|\]|\{|\}
 %%
 {KEYWORDS} printf("%d: KEY, val = %s\n", line_cont, yytext); fflush(stdout);
