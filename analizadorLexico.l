@@ -17,14 +17,22 @@
 DIGIT [0-9]
 LETRA [a-zA-Z]
 KEYWORDS else|if|int|return|void|while
-OPCOMPLEX <=|>=|==|!=
-OPSIMPLE \+|\-|\*|\/|\<|\>|\=|;|,|\(|\)|\[|\]|\{|\}
+COMPARADOR2 <=|>=|==|!=
+COMPARADOR \<|\>
+MULT \*|\/|
+SOMA \+|\-
+\(|\)
+\[|\]|
+|\{|\}
+\=|;|,
 %%
-{KEYWORDS} printf("%d: KEY, val = %s\n", line_cont, yytext); fflush(stdout);
-{DIGIT}{DIGIT}* printf("%d: NUM, val = %s\n", line_cont, yytext); fflush(stdout);
-{LETRA}{LETRA}* printf("%d: ID, val = %s\n", line_cont, yytext); fflush(stdout);
-{OPCOMPLEX} printf("%d: OP, val = %s\n", line_cont, yytext); fflush(stdout);
-{OPSIMPLE} printf("%d: OP, val = %s\n", line_cont, yytext); fflush(stdout);
+{KEYWORDS} printf("%d: KEY : %d\n", line_cont, yytext); fflush(stdout);
+{DIGIT}{DIGIT}* printf("%d: NUM : %d\n", line_cont, yytext); fflush(stdout);
+{LETRA}{LETRA}* printf("%d: ID : %d\n", line_cont, yytext); fflush(stdout);
+{COMPARADOR2} printf("%d: COMPARADOR : %d\n", line_cont, yytext); fflush(stdout);
+{COMPARADOR} printf("%d: COMPARADOR : %d\n", line_cont, yytext); fflush(stdout);
+{SOMA} printf("%d: SOMA : %d\n", line_cont, yytext); fflush(stdout);
+{MULT} printf("%d: MULT : %d\n", line_cont, yytext); fflush(stdout);
 \n	line_cont++;
 \s+|\t+
 \/\* comment();
