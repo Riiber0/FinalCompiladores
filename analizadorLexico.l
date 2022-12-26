@@ -15,29 +15,70 @@
 	
 %}
 DIGIT [0-9]
+NUM {DIGIT}{DIGIT}*
 LETRA [a-zA-Z]
-KEYWORDS else|if|int|return|void|while
-COMPARADOR2 <=|>=|==|!=
-COMPARADOR \<|\>
-MULT \*|\/|
-SOMA \+|\-
-\(|\)
-\[|\]|
-|\{|\}
-\=|;|,
+ID {LETRA}{LETRA}*
+IF if
+ELSE else
+INT int
+RETURN return
+VOID void
+WHILE while
+MAIORIGUAL <=
+MENORIGUAL >=
+IGUALIGUAL ==
+DIFERENTE !=
+MENOR <
+MAIOR >
+MULT \*
+DIV \/
+SOMA \+
+SUB \-
+PARNTS_OP \(
+PARNTS_CL \)
+COLX_OP \[
+COLX_CL \]
+CHAVES_OP \{
+CHAVES_CL \}
+IGUAL \=
+PNTVIRG ;
+VIRG ,
 %%
-{KEYWORDS} printf("%d: KEY : %d\n", line_cont, yytext); fflush(stdout);
-{DIGIT}{DIGIT}* printf("%d: NUM : %d\n", line_cont, yytext); fflush(stdout);
-{LETRA}{LETRA}* printf("%d: ID : %d\n", line_cont, yytext); fflush(stdout);
-{COMPARADOR2} printf("%d: COMPARADOR : %d\n", line_cont, yytext); fflush(stdout);
-{COMPARADOR} printf("%d: COMPARADOR : %d\n", line_cont, yytext); fflush(stdout);
-{SOMA} printf("%d: SOMA : %d\n", line_cont, yytext); fflush(stdout);
-{MULT} printf("%d: MULT : %d\n", line_cont, yytext); fflush(stdout);
+{NUM} { printf("%d: NUM | %s\n", line_cont, yytext);} 
+{IF} { printf("%d: IF | %s\n", line_cont, yytext);} 
+{ELSE} { printf("%d: ELSE | %s\n", line_cont, yytext);} 
+{INT} { printf("%d: INT | %s\n", line_cont, yytext);} 
+{RETURN} { printf("%d: RETURN | %s\n", line_cont, yytext);} 
+{VOID} { printf("%d: VOID | %s\n", line_cont, yytext);} 
+{WHILE} { printf("%d: WHILE | %s\n", line_cont, yytext);} 
+{ID} { printf("%d: ID | %s\n", line_cont, yytext);} 
+{MAIORIGUAL} { printf("%d: MAIORIGUAL | %s\n", line_cont, yytext);} 
+{MENORIGUAL} { printf("%d: MENORIGUAL | %s\n", line_cont, yytext);} 
+{IGUALIGUAL} { printf("%d: IGUALIGUAL | %s\n", line_cont, yytext);} 
+{DIFERENTE} { printf("%d: DIFERENTE | %s\n", line_cont, yytext);} 
+{MENOR} { printf("%d: MENOR | %s\n", line_cont, yytext);} 
+{MAIOR} { printf("%d: MAIOR | %s\n", line_cont, yytext);} 
+{MULT} { printf("%d: MULT | %s\n", line_cont, yytext);} 
+{DIV} { printf("%d: DIV | %s\n", line_cont, yytext);} 
+{SOMA} { printf("%d: SOMA | %s\n", line_cont, yytext);} 
+{SUB} { printf("%d: SUB | %s\n", line_cont, yytext);} 
+{PARNTS_OP} { printf("%d: PARNTS_OP | %s\n", line_cont, yytext);} 
+{PARNTS_CL} { printf("%d: PARNTS_CL | %s\n", line_cont, yytext);} 
+{COLX_OP} { printf("%d: COLX_OP | %s\n", line_cont, yytext);} 
+{COLX_CL} { printf("%d: COLX_CL | %s\n", line_cont, yytext);} 
+{CHAVES_OP} { printf("%d: CHAVES_OP | %s\n", line_cont, yytext);} 
+{CHAVES_CL} { printf("%d: CHAVES_CL | %s\n", line_cont, yytext);} 
+{IGUAL} { printf("%d: IGUAL | %s\n", line_cont, yytext);} 
+{PNTVIRG} { printf("%d: PNTVIRG | %s\n", line_cont, yytext);} 
+{VIRG} { printf("%d: VIRG | %s\n", line_cont, yytext);} 
+
 \n	line_cont++;
-\s+|\t+
+[ \n\t]
 \/\* comment();
 		
 <<EOF>> return 0;
+
+. printf("ERRO LEXICO: %s", yytext); exit(0);
 %%
 
 void comment(){
