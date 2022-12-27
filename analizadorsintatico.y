@@ -1,8 +1,9 @@
 %{
     #include "myglobals.h"
+	#include "arvoresintatica.h"
 
-    extern int line_cont;
-    FILE* source;
+	FILE* source;
+	treeNode *newTree;
 
 %}
 
@@ -118,14 +119,11 @@ int yyerror(char* msg){
     printf("error: %c, linha: %d\n",yylval.ch, line_cont);
     return 0;
 }
-/*
-static int yylex(void){ 
-    return getToken(); 
-}*/
 
-void parse(){
+treeNode *parse(){
     yyparse();
-
+	
+	return newTree;
 }
 
 int main(int arc, char** argv){
