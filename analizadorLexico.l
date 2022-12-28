@@ -70,17 +70,17 @@ VIRG ,
 {DIFERENTE} { printf("%d: DIFERENTE | %s\n", line_cont, yytext);
 	yylval.str = strdup(yytext); return DIFERENTE;} 
 {MENOR} { printf("%d: MENOR | %s\n", line_cont, yytext);
-	yylval.ch = yytext[0]; return MENOR;} 
+	yylval.str = strdup(yytext); return MENOR;} 
 {MAIOR} { printf("%d: MAIOR | %s\n", line_cont, yytext);
-	yylval.ch = yytext[0]; return MAIOR;} 
+	yylval.str = strdup(yytext); return MAIOR;} 
 {MULT} { printf("%d: MULT | %s\n", line_cont, yytext);
-	yylval.ch = yytext[0]; return MULT;} 
+	yylval.str = strdup(yytext); return MULT;} 
 {DIV} { printf("%d: DIV | %s\n", line_cont, yytext);
-	yylval.ch = yytext[0]; return DIV;} 
+	yylval.str = strdup(yytext); return DIV;} 
 {ADI} { printf("%d: ADI | %s\n", line_cont, yytext);
-	yylval.ch = yytext[0]; return ADI;} 
+	yylval.str = strdup(yytext); return ADI;} 
 {SUB} { printf("%d: SUB | %s\n", line_cont, yytext);
-	yylval.ch = yytext[0]; return SUB;} 
+	yylval.str = strdup(yytext); return SUB;} 
 {PARNTS_OP} { printf("%d: PARNTS_OP | %s\n", line_cont, yytext);
 	yylval.ch = yytext[0]; return PARNTS_OP;} 
 {PARNTS_CL} { printf("%d: PARNTS_CL | %s\n", line_cont, yytext);
@@ -94,7 +94,7 @@ VIRG ,
 {CHAVES_CL} { printf("%d: CHAVES_CL | %s\n", line_cont, yytext);
 	yylval.ch = yytext[0]; return CHAVES_CL;} 
 {IGUAL} { printf("%d: IGUAL | %s\n", line_cont, yytext);
-	yylval.ch = yytext[0]; return IGUAL;} 
+	yylval.str = strdup(yytext); return IGUAL;} 
 {PNTVIRG} { printf("%d: PNTVIRG | %s\n", line_cont, yytext);
 	yylval.ch = yytext[0]; return PNTVIRG;} 
 {VIRG} { printf("%d: VIRG | %s\n", line_cont, yytext);

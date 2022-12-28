@@ -1,6 +1,5 @@
 #include "arvoresintatica.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include "myglobals.h"
 
 static treeNode *alocador(){
 	treeNode *ret = (treeNode*)malloc(sizeof(treeNode));
@@ -12,30 +11,30 @@ static treeNode *alocador(){
 
 }
 
-treeNode* criaExp(int clin, tipoExp subt){
+treeNode* criaExp(tipoExp subt){
 	treeNode *ret = alocador();
 
-	ret->linha = clin;
+	ret->linha = line_cont;
 	ret->tipo = expk;
 	ret->subTipo.exp = subt;
 
 	return ret;
 }
 
-treeNode* criaDecl(int clin, tipoDecl subt){
+treeNode* criaDecl(tipoDecl subt){
 	treeNode *ret = alocador();
 
-	ret->linha = clin;
+	ret->linha = line_cont;
 	ret->tipo = declk;
 	ret->subTipo.decl = subt;
 
 	return ret;
 }
 
-treeNode* criaEnd(int clin, tipoEnd subt){
+treeNode* criaEnd(tipoEnd subt){
 	treeNode *ret = alocador();
 
-	ret->linha = clin;
+	ret->linha = line_cont;
 	ret->tipo = endk;
 	ret->subTipo.end = subt;
 
@@ -51,24 +50,40 @@ void desaloca(treeNode *node){
 	free(node);
 }
 
+int ident = 0;
+#define IDENTAR ident++
+#define DESIDENTAR ident--
+
+
+void prettyprint(treeNode* node){
+	for(int i = 0; i < ident; i++)
+		printf("  ");
+	printf("%d- ",node->linha);
+}
+
 void printaArv(treeNode *node){
-	if(!node) return;
+	if(node == NULL) return;
+	prettyprint(node);
 
 	if(node->tipo == expk){
 		switch(node->subTipo.exp){
 			case comp:
-				printf("%c\n", node->key.op);
+				printf("%s\n", node->key.op);
 			break;
 			
 			case atrb:
-				printf("%c\n", node->key.op);
+				printf("%s\n", node->key.op);
 			break;
 			
 			case mat:
-				printf("%c\n", node->key.op);
+				printf("%s\n", node->key.op);
 			break;
 			
 			case atv:
+				printf("%s\n", node->key.nome);
+			break;
+
+			case uso:
 				printf("%s\n", node->key.nome);
 			break;
 
@@ -125,7 +140,10 @@ void printaArv(treeNode *node){
 		printf("tipo não reconhecido: %d\n", node->tipo);
 	}
 
+	fflush(stdout);
+	IDENTAR;
 	for(int i = 0; i < MAXFILHO; i++) printaArv(node->filho[i]);
+	DESIDENTAR;
 	printaArv(node->irmao);
 
 }

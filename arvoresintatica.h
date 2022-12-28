@@ -2,11 +2,10 @@
 #define ARVORESINTATICA_H
 
 #define MAXFILHO 3
-typedef char opTipo;
 typedef enum {expk, declk, endk} tipoNo;
 
 typedef enum { selec, iterac, reto, func, vari} tipoDecl;
-typedef enum {comp, atrb, mat, atv} tipoExp;
+typedef enum {comp, atrb, mat, atv, uso} tipoExp;
 typedef enum {int_t, void_t, cons} tipoEnd;
 
 typedef struct treeNode{
@@ -17,15 +16,18 @@ typedef struct treeNode{
 	tipoNo tipo;
 
 	union {tipoDecl decl; tipoExp exp; tipoEnd end;} subTipo;
-	union { opTipo op;
+	union { char* op;
 			int val;
 			char *nome;} key;
 
-	unsigned char isList;
+	unsigned char especial;
 
 }treeNode;
 
-treeNode* criaExp(int clin, tipoExp subt);
-treeNode* criaDecl(int clin, tipoDecl subt);
+treeNode* criaExp( tipoExp subt);
+treeNode* criaDecl(tipoDecl subt);
+treeNode* criaEnd(tipoEnd subt);
+void printaArv(treeNode* node);
+void desaloca(treeNode* node);
 
 #endif
