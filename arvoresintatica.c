@@ -11,30 +11,30 @@ static treeNode *alocador(){
 
 }
 
-treeNode* criaExp(tipoExp subt){
+treeNode* criaExp(tipoExp subt, int line){
 	treeNode *ret = alocador();
 
-	ret->linha = line_cont;
+	ret->linha = line;
 	ret->tipo = expk;
 	ret->subTipo.exp = subt;
 
 	return ret;
 }
 
-treeNode* criaDecl(tipoDecl subt){
+treeNode* criaDecl(tipoDecl subt, int line){
 	treeNode *ret = alocador();
 
-	ret->linha = line_cont;
+	ret->linha = line;
 	ret->tipo = declk;
 	ret->subTipo.decl = subt;
 
 	return ret;
 }
 
-treeNode* criaEnd(tipoEnd subt){
+	treeNode* criaEnd(tipoEnd subt, int line){
 	treeNode *ret = alocador();
 
-	ret->linha = line_cont;
+	ret->linha = line;
 	ret->tipo = endk;
 	ret->subTipo.end = subt;
 

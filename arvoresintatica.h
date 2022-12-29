@@ -24,9 +24,9 @@ typedef struct treeNode{
 
 }treeNode;
 
-treeNode* criaExp( tipoExp subt);
-treeNode* criaDecl(tipoDecl subt);
-treeNode* criaEnd(tipoEnd subt);
+treeNode* criaExp(tipoExp subt, int line);
+treeNode* criaDecl(tipoDecl subt, int line);
+treeNode* criaEnd(tipoEnd subt, int line);
 void printaArv(treeNode* node);
 void desaloca(treeNode* node);
 

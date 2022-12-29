@@ -2,6 +2,8 @@
 	#include "analizadorsintatico.tab.h"
 	#include "myglobals.h"
 
+	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
+
 	int line_cont = 1;
 	FILE* line_r;
 	size_t line_size;
@@ -15,6 +17,8 @@
 	void comment();
 	
 %}
+%option yylineno
+
 DIGIT [0-9]
 NUM {DIGIT}{DIGIT}*
 LETRA [a-zA-Z]
