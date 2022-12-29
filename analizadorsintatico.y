@@ -2,13 +2,16 @@
     #include "myglobals.h"
 	#include "arvoresintatica.h"
 
-	FILE* source;
-	treeNode *newTree;
+	static treeNode *newTree;
 
 %}
 
 %code requires{
 	#include "arvoresintatica.h"
+}
+
+%code provides{
+	treeNode* parse();
 }
 
 %locations
@@ -197,12 +200,3 @@ treeNode *parse(){
 	return newTree;
 }
 
-int main(int arc, char** argv){
-    source = fopen(argv[1], "r");
-    extern FILE* yyin;
-    yyin = source;
-
-    parse();
-	printaArv(newTree);
-	desaloca(newTree);
-}
