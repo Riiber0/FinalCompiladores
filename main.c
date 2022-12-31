@@ -7,13 +7,20 @@ FILE *source;
 
 treeNode* preDef(treeNode* comeco){
 
+	treeNode *filhoRaiz, *filhoIrmao;
+	
+	filhoRaiz = criaEnd(void_t, 0);
+	filhoIrmao = criaEnd(void_t, 0);
+
 	treeNode *raiz, *irmao;
 
 	raiz = criaDecl(func, 0);
 	raiz->key.nome = "input";
+	raiz->filho[0] = filhoRaiz;
 
 	irmao = criaDecl(func, 0);
 	irmao->key.nome = "output";
+	irmao->filho[0] = filhoIrmao;
 
 	raiz->irmao = irmao;
 	irmao->irmao = comeco;
