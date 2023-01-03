@@ -6,7 +6,7 @@
 #include <string.h>
 
 extern FILE *source;
-extern int line_cont;
+extern unsigned char error;
 
 #endif
 

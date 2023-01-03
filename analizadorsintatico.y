@@ -190,8 +190,9 @@ arglista : arglista VIRG expressao {$1->irmao = $3;}
 %%
 
 int yyerror(char* msg){
-    printf("error: %c, linha: %d\n",yylval.ch, line_cont);
-    return 0;
+    printf("%s, linha: %d\n",msg, yylloc.first_line);
+	error = 1;
+    return 1;
 }
 
 treeNode *parse(){

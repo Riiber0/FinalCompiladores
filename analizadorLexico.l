@@ -4,14 +4,13 @@
 
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 
-	int line_cont = 1;
 	FILE* line_r;
 	size_t line_size;
 	char* line_buf = NULL;
 
 	void printa_linha(){
 		getline(&line_buf, &line_size, line_r);
-		printf("%d: %s", line_cont, line_buf);
+		printf("%d: %s", yylineno, line_buf);
 	}
 
 	void comment();
@@ -49,68 +48,68 @@ IGUAL \=
 PNTVIRG ;
 VIRG ,
 %%
-{NUM} { printf("%d: NUM | %s\n", line_cont, yytext);
+{NUM} { printf("%d: NUM | %s\n", yylineno, yytext);
 	yylval.num = atoi(yytext); return NUM;} 
-{IF} { printf("%d: IF | %s\n", line_cont, yytext);
+{IF} { printf("%d: IF | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return IF;} 
-{ELSE} { printf("%d: ELSE | %s\n", line_cont, yytext);
+{ELSE} { printf("%d: ELSE | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return ELSE;} 
-{INT} { printf("%d: INT | %s\n", line_cont, yytext);
+{INT} { printf("%d: INT | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return INT;} 
-{RETURN} { printf("%d: RETURN | %s\n", line_cont, yytext);
+{RETURN} { printf("%d: RETURN | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return RETURN;} 
-{VOID} { printf("%d: VOID | %s\n", line_cont, yytext);
+{VOID} { printf("%d: VOID | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return VOID;} 
-{WHILE} { printf("%d: WHILE | %s\n", line_cont, yytext);
+{WHILE} { printf("%d: WHILE | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return WHILE;} 
-{ID} { printf("%d: ID | %s\n", line_cont, yytext);
+{ID} { printf("%d: ID | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return ID;} 
-{MAIORIGUAL} { printf("%d: MAIORIGUAL | %s\n", line_cont, yytext);
+{MAIORIGUAL} { printf("%d: MAIORIGUAL | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return MAIORIGUAL;} 
-{MENORIGUAL} { printf("%d: MENORIGUAL | %s\n", line_cont, yytext);
+{MENORIGUAL} { printf("%d: MENORIGUAL | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return MENORIGUAL;} 
-{IGUALIGUAL} { printf("%d: IGUALIGUAL | %s\n", line_cont, yytext);
+{IGUALIGUAL} { printf("%d: IGUALIGUAL | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return IGUALIGUAL;} 
-{DIFERENTE} { printf("%d: DIFERENTE | %s\n", line_cont, yytext);
+{DIFERENTE} { printf("%d: DIFERENTE | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return DIFERENTE;} 
-{MENOR} { printf("%d: MENOR | %s\n", line_cont, yytext);
+{MENOR} { printf("%d: MENOR | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return MENOR;} 
-{MAIOR} { printf("%d: MAIOR | %s\n", line_cont, yytext);
+{MAIOR} { printf("%d: MAIOR | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return MAIOR;} 
-{MULT} { printf("%d: MULT | %s\n", line_cont, yytext);
+{MULT} { printf("%d: MULT | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return MULT;} 
-{DIV} { printf("%d: DIV | %s\n", line_cont, yytext);
+{DIV} { printf("%d: DIV | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return DIV;} 
-{ADI} { printf("%d: ADI | %s\n", line_cont, yytext);
+{ADI} { printf("%d: ADI | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return ADI;} 
-{SUB} { printf("%d: SUB | %s\n", line_cont, yytext);
+{SUB} { printf("%d: SUB | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return SUB;} 
-{PARNTS_OP} { printf("%d: PARNTS_OP | %s\n", line_cont, yytext);
+{PARNTS_OP} { printf("%d: PARNTS_OP | %s\n", yylineno, yytext);
 	yylval.ch = yytext[0]; return PARNTS_OP;} 
-{PARNTS_CL} { printf("%d: PARNTS_CL | %s\n", line_cont, yytext);
+{PARNTS_CL} { printf("%d: PARNTS_CL | %s\n", yylineno, yytext);
 	yylval.ch = yytext[0]; return PARNTS_CL;} 
-{COLX_OP} { printf("%d: COLX_OP | %s\n", line_cont, yytext);
+{COLX_OP} { printf("%d: COLX_OP | %s\n", yylineno, yytext);
 	yylval.ch = yytext[0]; return COLX_OP;} 
-{COLX_CL} { printf("%d: COLX_CL | %s\n", line_cont, yytext);
+{COLX_CL} { printf("%d: COLX_CL | %s\n", yylineno, yytext);
 	yylval.ch = yytext[0]; return COLX_CL;} 
-{CHAVES_OP} { printf("%d: CHAVES_OP | %s\n", line_cont, yytext);
+{CHAVES_OP} { printf("%d: CHAVES_OP | %s\n", yylineno, yytext);
 	yylval.ch = yytext[0]; return CHAVES_OP;} 
-{CHAVES_CL} { printf("%d: CHAVES_CL | %s\n", line_cont, yytext);
+{CHAVES_CL} { printf("%d: CHAVES_CL | %s\n", yylineno, yytext);
 	yylval.ch = yytext[0]; return CHAVES_CL;} 
-{IGUAL} { printf("%d: IGUAL | %s\n", line_cont, yytext);
+{IGUAL} { printf("%d: IGUAL | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return IGUAL;} 
-{PNTVIRG} { printf("%d: PNTVIRG | %s\n", line_cont, yytext);
+{PNTVIRG} { printf("%d: PNTVIRG | %s\n", yylineno, yytext);
 	yylval.ch = yytext[0]; return PNTVIRG;} 
-{VIRG} { printf("%d: VIRG | %s\n", line_cont, yytext);
+{VIRG} { printf("%d: VIRG | %s\n", yylineno, yytext);
 	yylval.ch = yytext[0]; return VIRG;} 
 
-\n	line_cont++;
+\n	
 [ \n\t]
 \/\* comment();
 		
 <<EOF>> return 0;
 
-. printf("ERRO LEXICO: %s", yytext); exit(0);
+. printf("ERRO LEXICO: %s, linha: %d\n", yytext, yylineno); error = 1;
 %%
 
 void comment(){
@@ -128,7 +127,7 @@ void comment(){
 		}
 		else if(c == '*' && !fim) fim++;
 		else if(c == 'n' && line){
-			line_cont++;
+			//line_cont++;
 			line = 0;
 		}
 		else {

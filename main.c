@@ -4,12 +4,13 @@
 #include <stdio.h>
 
 FILE *source;
+unsigned char error = 0;
 
 treeNode* preDef(treeNode* comeco){
 
 	treeNode *filhoRaiz, *filhoIrmao;
 	
-	filhoRaiz = criaEnd(void_t, 0);
+	filhoRaiz = criaEnd(int_t, 0);
 	filhoIrmao = criaEnd(void_t, 0);
 
 	treeNode *raiz, *irmao;
@@ -37,10 +38,12 @@ int main(int arc, char** argv){
 	treeNode *raiz, *tree;
 
     tree = parse();
-	raiz = preDef(tree);
+	if(!error){
+		raiz = preDef(tree);
 
-	printaArv(raiz);
-	fflush(stdout);
+		printaArv(raiz);
+		fflush(stdout);
+	}
 	desaloca(raiz);
 
 	return 0;
