@@ -10,7 +10,7 @@ treeNode* preDef(treeNode* comeco){
 
 	treeNode *filhoRaiz, *filhoIrmao;
 	
-	filhoRaiz = criaEnd(int_t, 0);
+		filhoRaiz = criaEnd(int_t, 0);
 	filhoIrmao = criaEnd(void_t, 0);
 
 	treeNode *raiz, *irmao;
