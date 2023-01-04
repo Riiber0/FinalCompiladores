@@ -2,6 +2,8 @@
     #include "myglobals.h"
 	#include "arvoresintatica.h"
 
+	int yylex();
+	int yyerror(char* msg);
 	static treeNode *newTree;
 
 %}
@@ -49,7 +51,7 @@ declaracaolista : declaracaolista declaracao {$1->irmao = $2;}
 declaracao : vardeclaracao {$$ = $1;}
 		   | fundeclaracao {$$ = $1;};
 
-	vardeclaracao : tipoespecificador ID PNTVIRG {$$ = criaDecl(vari, @2.first_line);
+vardeclaracao : tipoespecificador ID PNTVIRG {$$ = criaDecl(vari, @2.first_line);
 												$$->key.nome = strdup($2);
 			  									$$->filho[0] = $1;
 												$$->especial = 0;}

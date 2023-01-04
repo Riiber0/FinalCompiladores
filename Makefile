@@ -1,6 +1,4 @@
-CC = gcc
-
-all: sintatico lexico objetos final clean
+all: sintatico lexico final clean
 
 sintatico: $(wildcard *.y)
 	bison $< -d
@@ -8,10 +6,10 @@ sintatico: $(wildcard *.y)
 lexico: $(wildcard *.l)
 	flex $<
 
-objetos: $(wildcard *.c)
-	gcc $^ -c
+*.o: $(wildcard *.c) 
+	gcc $< -c $@
 
-final: $(wildcard *.o)
+final: *.c
 	gcc $^ -lfl -o teste
 
 clean: 
