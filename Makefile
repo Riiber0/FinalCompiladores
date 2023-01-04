@@ -6,9 +6,6 @@ sintatico: $(wildcard *.y)
 lexico: $(wildcard *.l)
 	flex $<
 
-*.o: $(wildcard *.c) 
-	gcc $< -c $@
-
 final: *.c
 	gcc $^ -lfl -o teste
 
