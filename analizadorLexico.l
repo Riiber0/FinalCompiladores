@@ -51,57 +51,57 @@ VIRG ,
 {NUM} { printf("%d: NUM | %s\n", yylineno, yytext);
 	yylval.num = atoi(yytext); return NUM;} 
 {IF} { printf("%d: IF | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return IF;} 
+	 return IF;} 
 {ELSE} { printf("%d: ELSE | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return ELSE;} 
+	return ELSE;} 
 {INT} { printf("%d: INT | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return INT;} 
+	return INT;} 
 {RETURN} { printf("%d: RETURN | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return RETURN;} 
+	return RETURN;} 
 {VOID} { printf("%d: VOID | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return VOID;} 
+	return VOID;} 
 {WHILE} { printf("%d: WHILE | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return WHILE;} 
+	return WHILE;} 
 {ID} { printf("%d: ID | %s\n", yylineno, yytext);
 	yylval.str = strdup(yytext); return ID;} 
 {MAIORIGUAL} { printf("%d: MAIORIGUAL | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return MAIORIGUAL;} 
+	yylval.op = maig; return MAIORIGUAL;} 
 {MENORIGUAL} { printf("%d: MENORIGUAL | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return MENORIGUAL;} 
+	yylval.op = meig; return MENORIGUAL;} 
 {IGUALIGUAL} { printf("%d: IGUALIGUAL | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return IGUALIGUAL;} 
+	yylval.op = igig; return IGUALIGUAL;} 
 {DIFERENTE} { printf("%d: DIFERENTE | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return DIFERENTE;} 
+	yylval.op = dife; return DIFERENTE;} 
 {MENOR} { printf("%d: MENOR | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return MENOR;} 
+	yylval.op = me; return MENOR;} 
 {MAIOR} { printf("%d: MAIOR | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return MAIOR;} 
-{MULT} { printf("%d: MULT | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return MULT;} 
-{DIV} { printf("%d: DIV | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return DIV;} 
-{ADI} { printf("%d: ADI | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return ADI;} 
-{SUB} { printf("%d: SUB | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return SUB;} 
-{PARNTS_OP} { printf("%d: PARNTS_OP | %s\n", yylineno, yytext);
-	yylval.ch = yytext[0]; return PARNTS_OP;} 
-{PARNTS_CL} { printf("%d: PARNTS_CL | %s\n", yylineno, yytext);
-	yylval.ch = yytext[0]; return PARNTS_CL;} 
-{COLX_OP} { printf("%d: COLX_OP | %s\n", yylineno, yytext);
-	yylval.ch = yytext[0]; return COLX_OP;} 
-{COLX_CL} { printf("%d: COLX_CL | %s\n", yylineno, yytext);
-	yylval.ch = yytext[0]; return COLX_CL;} 
-{CHAVES_OP} { printf("%d: CHAVES_OP | %s\n", yylineno, yytext);
-	yylval.ch = yytext[0]; return CHAVES_OP;} 
-{CHAVES_CL} { printf("%d: CHAVES_CL | %s\n", yylineno, yytext);
-	yylval.ch = yytext[0]; return CHAVES_CL;} 
+	yylval.op = ma; return MAIOR;} 
 {IGUAL} { printf("%d: IGUAL | %s\n", yylineno, yytext);
-	yylval.str = strdup(yytext); return IGUAL;} 
+	yylval.op = ig; return IGUAL;} 
+{MULT} { printf("%d: MULT | %s\n", yylineno, yytext);
+	yylval.op = mult; return MULT;} 
+{DIV} { printf("%d: DIV | %s\n", yylineno, yytext);
+	yylval.op = divs; return DIV;} 
+{ADI} { printf("%d: ADI | %s\n", yylineno, yytext);
+	yylval.op = adi; return ADI;} 
+{SUB} { printf("%d: SUB | %s\n", yylineno, yytext);
+	yylval.op = sub; return SUB;} 
+{PARNTS_OP} { printf("%d: PARNTS_OP | %s\n", yylineno, yytext);
+	return PARNTS_OP;} 
+{PARNTS_CL} { printf("%d: PARNTS_CL | %s\n", yylineno, yytext);
+	return PARNTS_CL;} 
+{COLX_OP} { printf("%d: COLX_OP | %s\n", yylineno, yytext);
+	return COLX_OP;} 
+{COLX_CL} { printf("%d: COLX_CL | %s\n", yylineno, yytext);
+	 return COLX_CL;} 
+{CHAVES_OP} { printf("%d: CHAVES_OP | %s\n", yylineno, yytext);
+	return CHAVES_OP;} 
+{CHAVES_CL} { printf("%d: CHAVES_CL | %s\n", yylineno, yytext);
+	return CHAVES_CL;} 
 {PNTVIRG} { printf("%d: PNTVIRG | %s\n", yylineno, yytext);
-	yylval.ch = yytext[0]; return PNTVIRG;} 
+	return PNTVIRG;} 
 {VIRG} { printf("%d: VIRG | %s\n", yylineno, yytext);
-	yylval.ch = yytext[0]; return VIRG;} 
+	return VIRG;} 
 
 \n	
 [ \n\t]

@@ -9,6 +9,7 @@
 %}
 
 %code requires{
+    #include "myglobals.h"
 	#include "arvoresintatica.h"
 }
 
@@ -21,8 +22,8 @@
 %token <num> NUM 
 %token <str> ID
 %token IF ELSE INT RETURN VOID WHILE
-%token <str> MAIORIGUAL MENORIGUAL IGUALIGUAL DIFERENTE MENOR MAIOR
-%token <str> MULT DIV ADI SUB IGUAL
+%token <op> MAIORIGUAL MENORIGUAL IGUALIGUAL DIFERENTE MENOR MAIOR
+%token <op> MULT DIV ADI SUB IGUAL
 %token PARNTS_OP PARNTS_CL COLX_OP COLX_CL CHAVES_OP CHAVES_CL
 %token PNTVIRG VIRG  
 
@@ -31,7 +32,8 @@
 %union{
     int num;
     char* str;
-    char ch;
+	char ch;
+	opType op;
 	treeNode* Node;
 }
 
@@ -39,13 +41,16 @@
 %type <Node> paramlista VOID INT compostodecl param localdeclaracoes statementlista statement
 %type <Node> expressaodecl selecaodecl iteracaodecl retornodecl expressao var simplesexpressao
 %type <Node> somaexpressao termo fator ativacao args arglista
-%type <str> relacional soma multi
+%type <op> relacional soma multi
 
 %%
 
 programa : declaracaolista {newTree = $1;};
 
-declaracaolista : declaracaolista declaracao {$1->irmao = $2;}
+declaracaolista : declaracaolista declaracao {treeNode* t = $1;
+												while(t->irmao != NULL){
+													t = t-> irmao;
+												}t->irmao = $2;}
 				| declaracao {$$ = $1;};
 
 declaracao : vardeclaracao {$$ = $1;}
@@ -53,6 +58,7 @@ declaracao : vardeclaracao {$$ = $1;}
 
 vardeclaracao : tipoespecificador ID PNTVIRG {$$ = criaDecl(vari, @2.first_line);
 												$$->key.nome = strdup($2);
+												free($2);
 			  									$$->filho[0] = $1;
 												$$->especial = 0;}
 			 | tipoespecificador ID COLX_OP NUM COLX_CL PNTVIRG {$$ = criaDecl(vari, @2.first_line);
@@ -60,6 +66,7 @@ vardeclaracao : tipoespecificador ID PNTVIRG {$$ = criaDecl(vari, @2.first_line)
 																	$$->filho[1] = criaEnd(cons, @4.first_line);
 																	$$->filho[1]->key.val = $4;
 																	$$->key.nome = strdup($2);
+																	free($2);
 																	$$->especial = 1;};
 
 tipoespecificador : INT {$$ = criaEnd(int_t, @1.first_line);}
@@ -67,6 +74,7 @@ tipoespecificador : INT {$$ = criaEnd(int_t, @1.first_line);}
 
 fundeclaracao : tipoespecificador ID PARNTS_OP params PARNTS_CL compostodecl{$$ = criaDecl(func, @2.first_line);
 			  																	$$->key.nome = strdup($2);
+																				free($2);
 			  																	$$->filho[0] = $1;
 																				$$->filho[1] = $4;
 																				$$->filho[2] = $6;};
@@ -74,16 +82,21 @@ fundeclaracao : tipoespecificador ID PARNTS_OP params PARNTS_CL compostodecl{$$ 
 params : paramlista {$$ = $1;}
 	   | VOID {$$ = criaEnd(void_t, @1.first_line);};
 
-paramlista : paramlista VIRG param {$1->irmao = $3;}
+paramlista : paramlista VIRG param {treeNode* t = $1;
+		   							while(t->irmao != NULL){
+										t = t->irmao;
+									} t->irmao = $3;}
 		   | param {$$ = $1;};
 
 param : tipoespecificador ID {$$ = criaDecl(vari, @2.first_line);
 	  							$$->key.nome = strdup($2);
+								free($2);
 								$$->filho[0] = $1;
 								$$->especial = 0;}
 	  | tipoespecificador ID COLX_OP COLX_CL {$$ = criaDecl(vari, @2.first_line);
 	  											$$->filho[0] = $1;
 												$$->key.nome = strdup($2);
+												free($2);
 												$$->especial = 1;};
 
 compostodecl : CHAVES_OP localdeclaracoes statementlista CHAVES_CL {treeNode *t = $2;
@@ -94,12 +107,20 @@ compostodecl : CHAVES_OP localdeclaracoes statementlista CHAVES_CL {treeNode *t 
 																		$$ = $2;
 																	}else $$ = $3;};
 
-localdeclaracoes : localdeclaracoes vardeclaracao {if($1 != NULL)$1->irmao = $2;
-				 									else $$ = $2;}
+localdeclaracoes : localdeclaracoes vardeclaracao {treeNode *t = $1;
+				 									if(t != NULL){
+														while(t->irmao != NULL){
+															t = t-> irmao;
+														} t-> irmao = $2;
+													}else $$ = $2;}
 				 | %empty {$$ = NULL;};
 
-statementlista : statementlista statement {if($1 != NULL)$1->irmao = $2;
-			   								else $$ = $2;}
+statementlista : statementlista statement {treeNode* t = $1;
+			   								if(t != NULL){
+												while(t->irmao != NULL){
+													t = t-> irmao;
+												} t-> irmao = $2;
+											}else $$ = $2;}
 			   | %empty {$$ = NULL;};
 
 statement : expressaodecl {$$ = $1;}
@@ -129,23 +150,25 @@ retornodecl : RETURN PNTVIRG {$$ = criaDecl(reto, @1.first_line);}
 										$$->filho[0] = $2;
 										$$->especial = 1;};
 
-expressao : var IGUAL expressao {$$ = criaExp(atrb, @2.first_line);
-		  							$$->key.op = strdup($2);
+expressao : var IGUAL expressao {$$ = criaExp(oper, @2.first_line);
+		  							$$->key.op = $2;
 									$$->filho[0] = $1;
 									$$->filho[1] = $3;}
 		  | simplesexpressao ;
 
 var : ID {$$ = criaExp(uso, @1.first_line);
-			$$->key.nome = strdup($1);}
+			$$->key.nome = strdup($1);
+			free($1);}
 	| ID COLX_OP expressao COLX_CL {$$ = criaExp(uso, @1.first_line);
 									$$->key.nome = strdup($1);
+									free($1);
 									$$->especial = 1;
 									$$->filho[0] = $3;};
 
-simplesexpressao : somaexpressao relacional somaexpressao {$$ = criaExp(comp, @2.first_line);
+simplesexpressao : somaexpressao relacional somaexpressao {$$ = criaExp(oper, @2.first_line);
 				 											$$->filho[0] = $1;
 															$$->filho[1] = $3;
-															$$->key.op = strdup($2);}
+															$$->key.op = $2;}
 				 | somaexpressao {$$ = $1;};
 
 relacional : MENORIGUAL {$$ = $1;}
@@ -155,19 +178,19 @@ relacional : MENORIGUAL {$$ = $1;}
 		   | IGUALIGUAL {$$ = $1;}
 		   | DIFERENTE {$$ = $1;};
 
-somaexpressao : somaexpressao soma termo {$$ = criaExp(mat, @2.first_line);
+somaexpressao : somaexpressao soma termo {$$ = criaExp(oper, @2.first_line);
 			  								$$->filho[0] = $1;
 											$$->filho[2] = $3;
-											$$->key.op = strdup($2);}
+											$$->key.op = $2;}
 			  | termo {$$ = $1;};
 
 soma : ADI {$$ = $1;}
 	 | SUB {$$ = $1;};
 
-termo : termo multi fator {$$ = criaExp(mat, @2.first_line);
+termo : termo multi fator {$$ = criaExp(oper, @2.first_line);
 	                       $$->filho[0] = $1;
 						   $$->filho[1] = $3;
-						   $$->key.op = strdup($2);}
+						   $$->key.op = $2;}
 	  | fator {$$ = $1;};
 
 multi : MULT {$$ = $1;}
@@ -181,7 +204,8 @@ fator : PARNTS_OP expressao PARNTS_CL {$$ = $2;}
 
 ativacao : ID PARNTS_OP args PARNTS_CL {$$ = criaExp(atv, @1.first_line);
 		 								$$->filho[0] = $3;
-										$$->key.nome = $1;};
+										$$->key.nome = strdup($1);
+										free($1);};
 
 args : arglista {$$ = $1;}
 	 | %empty {$$ = NULL;};

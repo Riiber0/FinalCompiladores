@@ -6,7 +6,7 @@ int gcd (int u, int v)
 
 /*teste de contagem de linha
 teste linha*/
-void main(void){ 
+void main(int a, int b){ 
   int x; int y;
   x = input(); y = input();
   output(gcd(x,y));

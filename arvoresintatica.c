@@ -1,5 +1,6 @@
 #include "arvoresintatica.h"
 #include "myglobals.h"
+#include <stdio.h>
 
 static treeNode *alocador(){
 	treeNode *ret = (treeNode*)malloc(sizeof(treeNode));
@@ -31,7 +32,7 @@ treeNode* criaDecl(tipoDecl subt, int line){
 	return ret;
 }
 
-	treeNode* criaEnd(tipoEnd subt, int line){
+treeNode* criaEnd(tipoEnd subt, int line){
 	treeNode *ret = alocador();
 
 	ret->linha = line;
@@ -42,10 +43,15 @@ treeNode* criaDecl(tipoDecl subt, int line){
 }
 
 void desaloca(treeNode *node){
-	if(!node) return;
+	if(node == NULL) return;
 
 	for(int i = 0; i < MAXFILHO; i++) desaloca(node->filho[i]);
 	desaloca(node->irmao);
+
+	if(node->tipo == declk && (node->subTipo.decl == func || node->subTipo.decl == vari))
+		free(node->key.nome);
+	else if(node->tipo == expk && (node->subTipo.decl == atv || node->subTipo.decl == uso))
+		free(node->key.nome);
 
 	free(node);
 }
@@ -61,24 +67,9 @@ void prettyprint(treeNode* node){
 	printf("%d- ",node->linha);
 }
 
-void printaArv(treeNode *node){
-	if(node == NULL) return;
-	prettyprint(node);
-
-	if(node->tipo == expk){
+void printa_noArv(treeNode* node){
+	if(node->tipo == expk && node->subTipo.exp != oper){
 		switch(node->subTipo.exp){
-			case comp:
-				printf("%s\n", node->key.op);
-			break;
-			
-			case atrb:
-				printf("%s\n", node->key.op);
-			break;
-			
-			case mat:
-				printf("%s\n", node->key.op);
-			break;
-			
 			case atv:
 				printf("%s\n", node->key.nome);
 			break;
@@ -89,6 +80,56 @@ void printaArv(treeNode *node){
 
 			default:
 				printf("subtipo nao reconhecido: %d", node->subTipo.exp);
+			break;
+		}
+	} else if(node->tipo == expk && node->subTipo.exp == oper){
+		switch(node->key.op){
+			case igig:
+				printf("==\n");
+			break;
+
+			case maig:
+				printf(">=\n");
+			break;
+
+			case meig:
+				printf("<=\n");
+			break;
+
+			case dife:
+				printf("!=\n");
+			break;
+
+			case ma:
+				printf(">\n");
+			break;
+
+			case me:
+				printf("<\n");
+			break;
+
+			case ig:
+				printf("=\n");
+			break;
+
+			case adi:
+				printf("+\n");
+			break;
+
+			case sub:
+				printf("-\n");
+			break;
+
+			case mult:
+				printf("*\n");
+			break;
+
+			case divs:
+				printf("/\n");
+			break;
+
+			default:
+				printf("operador nao reconhecido");
 			break;
 		}
 	} else if(node->tipo == declk){
@@ -141,6 +182,14 @@ void printaArv(treeNode *node){
 	}
 
 	fflush(stdout);
+}
+
+void printaArv(treeNode *node){
+	if(node == NULL) return;
+	prettyprint(node);
+		
+	printa_noArv(node);
+
 	IDENTAR;
 	for(int i = 0; i < MAXFILHO; i++) printaArv(node->filho[i]);
 	DESIDENTAR;

@@ -5,6 +5,8 @@
 
 #define TAB_SIZE 255
 #define SHIFT 4
+#define HASH_LOCAL hash(local_scope, node->key.nome)
+#define HASH_GLOBAL hash("", node->key.nome)
 
 typedef enum{var_tab, func_tab} id_type;
 typedef enum{void_d, int_d} data_type;
@@ -35,8 +37,8 @@ typedef struct tab_lines{
 extern tab_lines* symtab;
 extern unsigned char atribuicao;
 
+void erro_semantico(char* tk, int lin);
 tab_lines* create_tab(treeNode* node);
-int check_tab(tab_lines* tab, char* nome, id_type type);
 void printa_tab(tab_lines* tab);
 void destroy_tab(tab_lines* tab);
 
