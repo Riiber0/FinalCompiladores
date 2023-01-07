@@ -4,6 +4,7 @@
 #include "symtab.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 FILE *source;
 FILE* saida;
@@ -16,15 +17,20 @@ treeNode* preDef(treeNode* comeco){
 	filhoRaiz = criaEnd(int_t, 0);
 	filhoIrmao = criaEnd(void_t, 0);
 
-	treeNode *raiz, *irmao;
+	treeNode *raiz, *irmao, *arg;
 
 	raiz = criaDecl(func, 0);
 	raiz->key.nome = strdup("input");
 	raiz->filho[0] = filhoRaiz;
+	irmao->filho[1] = criaEnd(void_t, 0);
 
 	irmao = criaDecl(func, 0);
 	irmao->key.nome = strdup("output");
 	irmao->filho[0] = filhoIrmao;
+	arg = criaDecl(vari, 0);
+	arg->filho[0] = criaEnd(int_t, 0);
+	arg->key.nome = strdup("x");
+	irmao->filho[1] = arg;
 
 	raiz->irmao = irmao;
 	irmao->irmao = comeco;
