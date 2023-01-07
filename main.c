@@ -62,7 +62,7 @@ int main(int argc, char** argv){
 		return 1;
 	}
 
-	//printa_tab(tab);
+	printa_tab(tab);
 
 	desaloca(raiz);
 	destroy_tab(tab);

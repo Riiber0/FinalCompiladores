@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/types.h>
 
 unsigned char need_int = 0;
@@ -75,7 +76,8 @@ static tab_cols* new_var_tab(treeNode* node){
 }
 
 static int hash(char *scope, char* key){
-	char* fullName = (char*)malloc(sizeof(strlen(scope) + strlen(key) + 1));
+	char* fullName = (char*)malloc(strlen(scope) + strlen(key) + 1);
+	bzero(fullName, strlen(scope) + strlen(key) + 1);
 	memcpy(fullName, scope, strlen(scope));
 	strcat(fullName, key);
 
@@ -94,7 +96,7 @@ void erro_semantico(char* tk, int lin){
 
 static void cuida_vari(tab_lines* tab, treeNode* node){
 	int h_local = HASH_LOCAL;
-	int h_global = HASH_GLOBAL;
+	int h_global = hash("", node->key.nome);
 
 	if(node->filho[0]->subTipo.exp == void_t){
 		error = 1;
@@ -226,10 +228,10 @@ tab_lines* create_tab(treeNode* n){
 
 	while(node){
 		ret->num_entradas++;
-		h_global = HASH_GLOBAL;
+		h_global = hash("", node->key.nome);
 
 		if(node->tipo == declk && node->subTipo.decl == func){
-			printf("%s\n", node->key.nome); fflush(stdout);
+			printf("%s\n -> %d", node->key.nome, h_global); fflush(stdout);
 			ret->linhas[h_global] = new_func_tab(node);
 
 			local_scope = node->key.nome;
