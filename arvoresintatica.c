@@ -63,122 +63,122 @@ int ident = 0;
 
 void prettyprint(treeNode* node){
 	for(int i = 0; i < ident; i++)
-		printf("  ");
-	printf("%d- ",node->linha);
+		fprintf(saida, "  ");
+	fprintf(saida, "%d- ",node->linha);
 }
 
 void printa_noArv(treeNode* node){
 	if(node->tipo == expk && node->subTipo.exp != oper){
 		switch(node->subTipo.exp){
 			case atv:
-				printf("%s\n", node->key.nome);
+				fprintf(saida, "%s\n", node->key.nome);
 			break;
 
 			case uso:
-				printf("%s\n", node->key.nome);
+				fprintf(saida, "%s\n", node->key.nome);
 			break;
 
 			default:
-				printf("subtipo nao reconhecido: %d", node->subTipo.exp);
+				fprintf(saida, "subtipo nao reconhecido: %d", node->subTipo.exp);
 			break;
 		}
 	} else if(node->tipo == expk && node->subTipo.exp == oper){
 		switch(node->key.op){
 			case igig:
-				printf("==\n");
+				fprintf(saida, "==\n");
 			break;
 
 			case maig:
-				printf(">=\n");
+				fprintf(saida, ">=\n");
 			break;
 
 			case meig:
-				printf("<=\n");
+				fprintf(saida, "<=\n");
 			break;
 
 			case dife:
-				printf("!=\n");
+				fprintf(saida, "!=\n");
 			break;
 
 			case ma:
-				printf(">\n");
+				fprintf(saida, ">\n");
 			break;
 
 			case me:
-				printf("<\n");
+				fprintf(saida, "<\n");
 			break;
 
 			case ig:
-				printf("=\n");
+				fprintf(saida, "=\n");
 			break;
 
 			case adi:
-				printf("+\n");
+				fprintf(saida, "+\n");
 			break;
 
 			case sub:
-				printf("-\n");
+				fprintf(saida, "-\n");
 			break;
 
 			case mult:
-				printf("*\n");
+				fprintf(saida, "*\n");
 			break;
 
 			case divs:
-				printf("/\n");
+				fprintf(saida, "/\n");
 			break;
 
 			default:
-				printf("operador nao reconhecido");
+				fprintf(saida, "operador nao reconhecido");
 			break;
 		}
 	} else if(node->tipo == declk){
 		switch(node->subTipo.decl){
 
 			case selec:
-				printf("if\n");
+				fprintf(saida, "if\n");
 			break;
 
 			case iterac:
-				printf("while\n");
+				fprintf(saida, "while\n");
 			break;
 
 			case reto:
-				printf("return\n");
+				fprintf(saida, "return\n");
 			break;
 
 			case func:
-				printf("%s\n", node->key.nome);
+				fprintf(saida, "%s\n", node->key.nome);
 			break;
 
 			case vari:
-				printf("%s\n", node->key.nome);
+				fprintf(saida, "%s\n", node->key.nome);
 			break;
 
 			default:
-				printf("subtipo nao reconhecido: %d", node->subTipo.decl);
+				fprintf(saida, "subtipo nao reconhecido: %d", node->subTipo.decl);
 			break;
 		}
 	} else if(node->tipo == endk){
 		switch(node->subTipo.end){
 			case int_t:
-				printf("int\n");
+				fprintf(saida, "int\n");
 			break;
 
 			case void_t:
-				printf("void\n");
+				fprintf(saida, "void\n");
 			break;
 
 			case cons:
-				printf("%d\n", node->key.val);
+				fprintf(saida, "%d\n", node->key.val);
 			break;
 
 			default:
-				printf("subtipo nao reconhecido: %d", node->subTipo.end);
+				fprintf(saida, "subtipo nao reconhecido: %d", node->subTipo.end);
 			break;
 		}
 	} else{
-		printf("tipo não reconhecido: %d\n", node->tipo);
+		fprintf(saida, "tipo não reconhecido: %d\n", node->tipo);
 	}
 
 	fflush(stdout);

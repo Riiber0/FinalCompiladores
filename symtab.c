@@ -36,7 +36,7 @@ static tab_cols* new_func_tab(treeNode* node){
 	tab_cols* ret;
 	ret = (tab_cols*)malloc(sizeof(tab_cols));
 	if(ret == NULL){
-		printf("sem memoria\n");
+		fprintf(saida, "sem memoria\n");
 		error = 1;
 		return NULL;
 	}
@@ -59,7 +59,7 @@ static tab_cols* new_var_tab(treeNode* node){
 	tab_cols* ret;
 	ret = (tab_cols*)malloc(sizeof(tab_cols));
 	if(ret == NULL){
-		printf("sem memoria\n");
+		fprintf(saida, "sem memoria\n");
 		error = 1;
 		return NULL;
 	}
@@ -90,8 +90,8 @@ static int hash(char *scope, char* key){
 	return ret;
 }
 
-void erro_semantico(char* tk, int lin){
-	printf("erro semantico: %s, linha: %d\n",tk, lin);
+static void erro_semantico(char* tk, char* msg, int lin){
+	fprintf(saida, "erro semantico: %s, token \'%s\', linha: %d\n", msg, tk, lin);
 }
 
 static void cuida_vari(tab_lines* tab, treeNode* node){
@@ -100,8 +100,7 @@ static void cuida_vari(tab_lines* tab, treeNode* node){
 
 	if(node->filho[0]->subTipo.exp == void_t){
 		error = 1;
-		printf("variavel void - ");
-		erro_semantico(node->key.nome, node->linha);
+		erro_semantico(node->key.nome, "variavel void",node->linha);
 		return;
 	}
 
@@ -111,8 +110,7 @@ static void cuida_vari(tab_lines* tab, treeNode* node){
 		while(l){
 			if(!strcmp(l->nome, node->key.nome) && !strcmp(l->escopo, "global0")){
 				error = 1;
-				printf("variavel declarada globalmente anteriormente - ");
-				erro_semantico(node->key.nome, node->linha);
+				erro_semantico(node->key.nome, "variavel declarada globalmente anteriormente", node->linha);
 				return;
 			}
 			l = l->prox;
@@ -124,8 +122,7 @@ static void cuida_vari(tab_lines* tab, treeNode* node){
 
 		if(!strcmp(l->nome, node->key.nome) && !strcmp(l->escopo, local_scope)){
 			error = 1;
-			printf("variavel declarada anteriormente - ");
-			erro_semantico(node->key.nome, node->linha);
+			erro_semantico(node->key.nome, "variavel declarada anteriormente", node->linha);
 			return;
 		}
 
@@ -135,8 +132,7 @@ static void cuida_vari(tab_lines* tab, treeNode* node){
 		while(l){
 			if(!strcmp(l->nome, node->key.nome) && !strcmp(l->escopo, local_scope)){
 				error = 1;
-				printf("variavel declarada anteriormente - ");
-				erro_semantico(node->key.nome, node->linha);
+				erro_semantico(node->key.nome, "variavel declarada anteriormente", node->linha);
 				return;
 			}
 			ant = l;
@@ -174,8 +170,7 @@ void cuida_uso(tab_lines* tab, treeNode* node){
 		}
 	}
 	error = 1;
-	printf("variavel nao declarada - ");
-	erro_semantico(node->key.nome, node->linha);
+	erro_semantico(node->key.nome, "variavel nao declarada",node->linha);
 }
 
 void cuida_atv(tab_lines* tab, treeNode* node){
@@ -194,13 +189,12 @@ void cuida_atv(tab_lines* tab, treeNode* node){
 		}
 	} 
 	error = 1;
-	erro_semantico(node->key.nome, node->linha);
+	erro_semantico(node->key.nome, "funcao nao declarada",node->linha);
 }
 
 static void percorre_subarv_tab(tab_lines* tab, treeNode* node){
 	if(node == NULL) return;
 	unsigned char isAssing = 0;
-	printa_noArv(node);
 
 	if(node->tipo == declk && node->subTipo.decl == vari){
 		tab->num_entradas++;
@@ -224,14 +218,15 @@ static void percorre_subarv_tab(tab_lines* tab, treeNode* node){
 tab_lines* create_tab(treeNode* n){
 	tab_lines* ret = (tab_lines*)malloc(sizeof(tab_lines));
 	int h_global;
+	char have_main;
 	treeNode* node = n;
 
-	while(node){
+	while(node && !have_main){
+
 		ret->num_entradas++;
 		h_global = hash("", node->key.nome);
 
 		if(node->tipo == declk && node->subTipo.decl == func){
-			printf("%s\n -> %d", node->key.nome, h_global); fflush(stdout);
 			ret->linhas[h_global] = new_func_tab(node);
 
 			local_scope = node->key.nome;
@@ -240,13 +235,24 @@ tab_lines* create_tab(treeNode* n){
 
 
 		} else if(node->tipo == declk && node->subTipo.decl == vari) {
-			printf("%s\n", node->key.nome); fflush(stdout);
 			ret->linhas[h_global] = new_var_tab(node);
 		}
+
+		if(ret->linhas[h_global]->tipo_id == func_tab && !strcmp(ret->linhas[h_global]->nome, "main"))
+			have_main = 1;
 
 		node = node->irmao;
 
 	}
+
+	if(node != NULL){
+		error = 1;
+		erro_semantico(node->key.nome, "declaracao pos main", node->linha);
+	} else if(!have_main){
+		error = 1;
+		erro_semantico("main", "funcao main nao declarada", yylineno);
+	}
+
 
 	return ret;
 }
@@ -273,27 +279,27 @@ void destroy_tab(tab_lines* tab){
 }
 
 void printa_tab(tab_lines* tab){
-	printf("tamanho efetivo da tabela: %d\n", tab->num_entradas);
+	fprintf(saida, "tamanho efetivo da tabela: %d\n", tab->num_entradas);
 
 	for(int i = 0; i < TAB_SIZE; i++){
 		tab_cols* entrada = tab->linhas[i];
 
 		while(entrada){
-			printf("%d| %s - %s - ", i, entrada->nome, entrada->escopo);
+			fprintf(saida, "%d| %s - %s - ", i, entrada->nome, entrada->escopo);
 
-			if(entrada->tipo_id == func_tab) printf("func - ");
-			else printf("var - ");
+			if(entrada->tipo_id == func_tab) fprintf(saida, "func - ");
+			else fprintf(saida, "var - ");
 
-			if(entrada->tipo_id == int_d) printf("int - ");
-			else printf("void : ");
+			if(entrada->tipo_id == int_d) fprintf(saida, "int - ");
+			else fprintf(saida, "void : ");
 
 			lin_t* l = entrada->linhas;
 
 			while(l){
-				printf("%lu,",l->key);
+				fprintf(saida, "%lu,",l->key);
 				l = l->prox;
 			}
-			printf("\n");
+			fprintf(saida, "\n");
 			entrada = entrada->prox;
 			fflush(stdout);
 		}

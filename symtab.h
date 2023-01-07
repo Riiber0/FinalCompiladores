@@ -8,6 +8,8 @@
 #define HASH_LOCAL hash(local_scope, node->key.nome)
 #define HASH_GLOBAL hash("", node->key.nome)
 
+extern int yylineno;
+
 typedef enum{var_tab, func_tab} id_type;
 typedef enum{void_d, int_d} data_type;
 
@@ -37,7 +39,6 @@ typedef struct tab_lines{
 extern tab_lines* symtab;
 extern unsigned char atribuicao;
 
-void erro_semantico(char* tk, int lin);
 tab_lines* create_tab(treeNode* node);
 void printa_tab(tab_lines* tab);
 void destroy_tab(tab_lines* tab);

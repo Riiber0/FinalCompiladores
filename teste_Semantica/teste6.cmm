@@ -1,0 +1,3 @@
+int funum(void) { /*...*/ }
+int fundois(void) { /*...*/ }
+int funtres(void) { /*...*/ }

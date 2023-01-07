@@ -1,9 +1,11 @@
 %{
+
     #include "myglobals.h"
 	#include "arvoresintatica.h"
 
 	int yylex();
 	int yyerror(char* msg);
+	extern char* yytext;
 	static treeNode *newTree;
 
 %}
@@ -216,7 +218,7 @@ arglista : arglista VIRG expressao {$1->irmao = $3;}
 %%
 
 int yyerror(char* msg){
-    printf("%s, linha: %d\n",msg, yylloc.first_line);
+    fprintf(saida, "Erro sintatico: %s, linha: %d\n", yytext, yylloc.first_line);
 	error = 1;
     return 1;
 }
