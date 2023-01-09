@@ -103,26 +103,25 @@ static void cuida_vari(tab_lines* tab, treeNode* node){
 		erro_semantico(node->key.nome, "variavel void",node->linha);
 		return;
 	}
-
 	if(tab->linhas[h_global] != NULL){
 		tab_cols* l = tab->linhas[h_global];
 		
 		while(l){
 			if(!strcmp(l->nome, node->key.nome) && !strcmp(l->escopo, "global0")){
 				error = 1;
-				erro_semantico(node->key.nome, "variavel declarada globalmente anteriormente", node->linha);
+				erro_semantico(node->key.nome, "declaracao global anterior ja definida", node->linha);
 				return;
 			}
 			l = l->prox;
 		}
 	}
 
-	else if(tab->linhas[h_local] != NULL){
+	if(tab->linhas[h_local] != NULL){
 		tab_cols* l = tab->linhas[h_local];
 
 		if(!strcmp(l->nome, node->key.nome) && !strcmp(l->escopo, local_scope)){
 			error = 1;
-			erro_semantico(node->key.nome, "variavel declarada anteriormente", node->linha);
+			erro_semantico(node->key.nome, "declaracao anterior ja definida", node->linha);
 			return;
 		}
 
@@ -140,7 +139,7 @@ static void cuida_vari(tab_lines* tab, treeNode* node){
 		}
 		ant->prox = new_var_tab(node);
 	}
-	else if(tab->linhas[h_global] == NULL && tab->linhas[h_local] == NULL) tab->linhas[h_local] = new_var_tab(node);
+	else tab->linhas[h_local] = new_var_tab(node);
 }
 
 void cuida_uso(tab_lines* tab, treeNode* node){
@@ -215,32 +214,60 @@ static void percorre_subarv_tab(tab_lines* tab, treeNode* node){
 
 }
 
+static void trata_colisao_tab(tab_cols* celula){
+
+}
+
 tab_lines* create_tab(treeNode* n){
 	tab_lines* ret = (tab_lines*)malloc(sizeof(tab_lines));
 	int h_global;
-	char have_main;
+	char have_main = 0;
+	tab_cols* temp;
 	treeNode* node = n;
 
-	while(node && !have_main){
+	while(node && !have_main && !error){
 
 		ret->num_entradas++;
 		h_global = hash("", node->key.nome);
+		temp = ret->linhas[h_global];
 
-		if(node->tipo == declk && node->subTipo.decl == func){
-			ret->linhas[h_global] = new_func_tab(node);
+		if(temp != NULL){
+			if(!strcmp(node->key.nome, temp->nome) && !strcmp(temp->escopo, "global0")){
+				erro_semantico(node->key.nome, "declaracao global anterior ja definida", node->linha);
+				error = 1;
+				return ret;
+			}
 
-			local_scope = node->key.nome;
-			for(int i = 0; i < MAXFILHO && !error; i++)
-				percorre_subarv_tab(ret, node->filho[i]);
+			while(temp->prox != NULL){
+				if(!strcmp(node->key.nome, temp->nome) && !strcmp(temp->escopo, "global0")){
+					erro_semantico(node->key.nome, "variavel declarada globalmente anteriormente", node->linha);
+					error = 1;
+					return ret;
+				}
+				temp = temp->prox;
+			}
 
+			if(node->tipo == declk && node->subTipo.decl == func)
+				temp->prox = new_func_tab(node);
+			else temp->prox = new_var_tab(node);
 
-		} else if(node->tipo == declk && node->subTipo.decl == vari) {
-			ret->linhas[h_global] = new_var_tab(node);
+		} else {
+			if(node->tipo == declk && node->subTipo.decl == func)
+				ret->linhas[h_global] = new_func_tab(node);
+			else ret->linhas[h_global] = new_var_tab(node);
+
+			temp = ret->linhas[h_global];
 		}
 
-		if(ret->linhas[h_global]->tipo_id == func_tab && !strcmp(ret->linhas[h_global]->nome, "main"))
-			have_main = 1;
+		if(temp->tipo_id == func_tab){
+			local_scope = temp->nome;
+			for(int i = 0; i < MAXFILHO; i++)
+				percorre_subarv_tab(ret, node->filho[i]);
 
+			if(!strcmp(temp->nome, "main")) have_main = 1;
+		}
+
+		local_scope = "global0";
 		node = node->irmao;
 
 	}
@@ -264,14 +291,23 @@ static void desaloca_lin(lin_t* l){
 	free(l);
 }
 
+static void desaloca_tab(tab_cols* l){
+	if(l == NULL) return;
+
+	desaloca_tab(l->prox);
+	desaloca_lin(l->linhas);
+	free(l->nome);
+	free(l->escopo);
+	free(l);
+
+}
+
 void destroy_tab(tab_lines* tab){
 
-	for(int i = 0; i < TAB_SIZE; i++){
+		for(int i = 0, j = 0; i < TAB_SIZE && j != tab->num_entradas; i++){
 		if(tab->linhas[i] != NULL){
-			desaloca_lin(tab->linhas[i]->linhas);
-			free(tab->linhas[i]->nome);
-			free(tab->linhas[i]->escopo);
-			free(tab->linhas[i]);
+			j++;
+			desaloca_tab(tab->linhas[i]);
 		}
 	}
 	free(tab);
@@ -281,10 +317,11 @@ void destroy_tab(tab_lines* tab){
 void printa_tab(tab_lines* tab){
 	fprintf(saida, "tamanho efetivo da tabela: %d\n", tab->num_entradas);
 
-	for(int i = 0; i < TAB_SIZE; i++){
+	for(int i = 0, j = 0; i < TAB_SIZE && j != tab->num_entradas; i++){
 		tab_cols* entrada = tab->linhas[i];
 
 		while(entrada){
+			j++;
 			fprintf(saida, "%d| %s - %s - ", i, entrada->nome, entrada->escopo);
 
 			if(entrada->tipo_id == func_tab) fprintf(saida, "func - ");
