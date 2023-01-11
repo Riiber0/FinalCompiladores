@@ -212,7 +212,10 @@ ativacao : ID PARNTS_OP args PARNTS_CL {$$ = criaExp(atv, @1.first_line);
 args : arglista {$$ = $1;}
 	 | %empty {$$ = NULL;};
 
-arglista : arglista VIRG expressao {$1->irmao = $3;}
+arglista : arglista VIRG expressao {treeNode* t = $1;
+												while(t->irmao != NULL){
+												t = t-> irmao;
+												}t->irmao = $3;}
 		 | expressao {$$ = $1;};
 
 %%
