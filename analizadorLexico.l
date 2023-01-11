@@ -4,8 +4,6 @@
 
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 
-	size_t line_size;
-
 	void comment();
 	
 %}
@@ -102,33 +100,30 @@ VIRG ,
 		
 <<EOF>> return 0;
 
-. fprintf(saida, "ERRO LEXICO: %s, linha: %d\n", yytext, yylineno); error = 1;
+. {fprintf(saida, "ERRO LEXICO: %s, linha: %d\n", yytext, yylineno); error = 1;}
 %%
 
 void comment(){
 
 	char c;
 	unsigned char fim = 0;
-	unsigned char line = 0;
 	while(fim != 2){
 
 		c = input();
 		if(c == EOF) break;
-		else if(c == '/'){
-			if(fim) fim++;
-			else if(!line)line++;
-		}
+		else if(c == '/' && fim)
+			fim++;
 		else if(c == '*' && !fim) fim++;
-		else if(c == 'n' && line){
-			//line_cont++;
-			line = 0;
-		}
 		else {
-			line = 0;
 			fim = 0;
 		}
 
 	}
 
+}
+
+void flex_end(){
+	yy_delete_buffer(YY_CURRENT_BUFFER);
+	yylex_destroy();
 }
 

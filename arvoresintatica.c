@@ -50,7 +50,7 @@ void desaloca(treeNode *node){
 
 	if(node->tipo == declk && (node->subTipo.decl == func || node->subTipo.decl == vari))
 		free(node->key.nome);
-	else if(node->tipo == expk && (node->subTipo.decl == atv || node->subTipo.decl == uso))
+	else if(node->tipo == expk && node->subTipo.exp != oper)
 		free(node->key.nome);
 
 	free(node);

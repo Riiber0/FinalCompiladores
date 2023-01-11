@@ -1,0 +1,11 @@
+/* aax e ap colidem localmente
+   aax, ap e output colidem globalmente*/
+
+
+int main(void){
+	int ap;
+	int aax;
+
+	aax = input();
+	ap = input();
+}

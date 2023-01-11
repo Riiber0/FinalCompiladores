@@ -8,7 +8,7 @@
 #include <sys/types.h>
 
 unsigned char need_int = 0;
-char* local_scope = "global";
+char* local_scope = "global0";
 
 static tab_lines* init_tab(){
 	tab_lines* ret;
@@ -107,7 +107,7 @@ static void cuida_vari(tab_lines* tab, treeNode* node){
 		tab_cols* l = tab->linhas[h_global];
 		
 		while(l){
-			if(!strcmp(l->nome, node->key.nome) && !strcmp(l->escopo, "global0")){
+			if(!strcmp(l->nome, node->key.nome) && !strcmp(l->escopo, "global0") && l->tipo_id == func_tab){
 				error = 1;
 				erro_semantico(node->key.nome, "declaracao global anterior ja definida", node->linha);
 				return;
@@ -272,10 +272,10 @@ tab_lines* create_tab(treeNode* n){
 
 	}
 
-	if(node != NULL){
+	if(node != NULL && !error){
 		error = 1;
 		erro_semantico(node->key.nome, "declaracao pos main", node->linha);
-	} else if(!have_main){
+	} else if(!have_main && !error){
 		error = 1;
 		erro_semantico("main", "funcao main nao declarada", yylineno);
 	}
