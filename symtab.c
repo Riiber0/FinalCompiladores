@@ -7,10 +7,12 @@
 #include <strings.h>
 #include <sys/types.h>
 
-unsigned char need_int = 0;
-char* local_scope = "global0";
+unsigned char need_int = 0;// indica que um funcao ativada em um expressao
+						   // nao pode ser do tipo void
+char* local_scope = "global0";// escopo inicial
+//escopo global termina em 0 para nao ser confundido com nome de funcao
 
-static tab_lines* init_tab(){
+static tab_lines* init_tab(){// aloca a tabela e aponta suas entradas para null
 	tab_lines* ret;
 
 	ret = (tab_lines*)malloc(sizeof(tab_lines));
@@ -23,7 +25,7 @@ static tab_lines* init_tab(){
 	return ret;
 }
 
-static lin_t* aloca_lin(int linha){
+static lin_t* aloca_lin(int linha){// aloca uma celula da lista de linhas
 	lin_t* ret = (lin_t*)malloc(sizeof(lin_t));
 
 	ret->key = linha;
@@ -32,7 +34,7 @@ static lin_t* aloca_lin(int linha){
 	return ret;
 }
 
-static tab_cols* new_func_tab(treeNode* node){
+static tab_cols* new_func_tab(treeNode* node){//cria nova entrada da tabela para funcao
 	tab_cols* ret;
 	ret = (tab_cols*)malloc(sizeof(tab_cols));
 	if(ret == NULL){
@@ -42,7 +44,7 @@ static tab_cols* new_func_tab(treeNode* node){
 	}
 
 	ret->nome = strdup(node->key.nome);
-	ret->escopo = strdup("global0");
+	ret->escopo = strdup("global0");//declaracao de funcao sempre goblal
 	ret->tipo_id = func_tab;
 	ret->prox = NULL;
 	
@@ -55,7 +57,7 @@ static tab_cols* new_func_tab(treeNode* node){
 	return ret;
 }
 
-static tab_cols* new_var_tab(treeNode* node){
+static tab_cols* new_var_tab(treeNode* node){// cria nova entrada da tabela para variaveis
 	tab_cols* ret;
 	ret = (tab_cols*)malloc(sizeof(tab_cols));
 	if(ret == NULL){
@@ -75,7 +77,8 @@ static tab_cols* new_var_tab(treeNode* node){
 	return ret;
 }
 
-static int hash(char *scope, char* key){
+static int hash(char *scope, char* key){// funcao de hash
+	//concatena o escopo com o nome para fazer o hash
 	char* fullName = (char*)malloc(strlen(scope) + strlen(key) + 1);
 	bzero(fullName, strlen(scope) + strlen(key) + 1);
 	memcpy(fullName, scope, strlen(scope));
@@ -86,23 +89,24 @@ static int hash(char *scope, char* key){
 	for(int i = 0; fullName[i] != '\0'; i++)
 		ret = ((ret << SHIFT) + fullName[i]) % TAB_SIZE;
 
-	free(fullName);
+	free(fullName);// desaloca o buffer utilizado
 	return ret;
 }
 
-static void erro_semantico(char* tk, char* msg, int lin){
+static void erro_semantico(char* tk, char* msg, int lin){// prita o erro semantico
 	fprintf(saida, "erro semantico: %s, token \'%s\', linha: %d\n", msg, tk, lin);
 }
 
-static void cuida_vari(tab_lines* tab, treeNode* node){
+static void cuida_vari(tab_lines* tab, treeNode* node){//nova declaracao de variavel
 	int h_local = HASH_LOCAL;
 	int h_global = hash("", node->key.nome);
 
-	if(node->filho[0]->subTipo.exp == void_t){
+	if(node->filho[0]->subTipo.exp == void_t){// varivel nao pode ser void
 		error = 1;
 		erro_semantico(node->key.nome, "variavel void",node->linha);
 		return;
 	}
+	//verifica se nome ja foi usado por um funcao ou se e apenas colizao de hash
 	if(tab->linhas[h_global] != NULL){
 		tab_cols* l = tab->linhas[h_global];
 		
@@ -116,6 +120,7 @@ static void cuida_vari(tab_lines* tab, treeNode* node){
 		}
 	}
 
+	//verifica se a varivel ja foi declarada no escopo ou colizao de hash
 	if(tab->linhas[h_local] != NULL){
 		tab_cols* l = tab->linhas[h_local];
 
@@ -139,99 +144,106 @@ static void cuida_vari(tab_lines* tab, treeNode* node){
 		}
 		ant->prox = new_var_tab(node);
 	}
-	else tab->linhas[h_local] = new_var_tab(node);
+	else tab->linhas[h_local] = new_var_tab(node);// caso base
 }
 
-void cuida_uso(tab_lines* tab, treeNode* node){
+void cuida_uso(tab_lines* tab, treeNode* node){//novo uso de varivel
 	int h_local = HASH_LOCAL;
 	int h_global = HASH_GLOBAL;
 
-	if(tab->linhas[h_global] != NULL){
-		tab_cols* l = tab->linhas[h_global];
-		
-		while(l){
-			if(!strcmp(l->nome, node->key.nome) && !strcmp(l->escopo, "global0")){
-				l->last_line = l->last_line->prox = aloca_lin(node->linha);
-				return;
-			}
-			l = l->prox;
-		}
-	} 
+	// procura a declaracao da variavel e insire uma nova linha de aparicao
+	// da preferencia para declaracao local
+	// checao colizo de hassh
 	if(tab->linhas[h_local] != NULL){
 		tab_cols* l = tab->linhas[h_local];
 		
 		while(l){
 			if(!strcmp(l->nome, node->key.nome) && !strcmp(l->escopo, local_scope)){
-				l->last_line = l->last_line->prox = aloca_lin(node->linha);
+				l->last_line = l->last_line->prox = aloca_lin(node->linha);// encontrada no escopo local
 				return;
 			}
 			l = l->prox;
 		}
 	}
+	else if(tab->linhas[h_global] != NULL){
+		tab_cols* l = tab->linhas[h_global];
+		
+		while(l){
+			if(!strcmp(l->nome, node->key.nome) && !strcmp(l->escopo, "global0")){
+				l->last_line = l->last_line->prox = aloca_lin(node->linha);//encontrada no escopo global
+				return;
+			}
+			l = l->prox;
+		}
+	} 
+	//declaracao previa nao encontrada
 	error = 1;
 	erro_semantico(node->key.nome, "variavel nao declarada",node->linha);
 }
 
-void cuida_atv(tab_lines* tab, treeNode* node){
+void cuida_atv(tab_lines* tab, treeNode* node){//noca ativacao de variavel
 	int h_global = HASH_GLOBAL;
 
+	//verifica se funcao foi declarada
+	//verifica se e colizao de hash
 	if(tab->linhas[h_global] != NULL){
 		tab_cols* l = tab->linhas[h_global];
 		
 		while(l){
 			if((!strcmp(l->nome, node->key.nome) && !strcmp(l->escopo, "global0"))
 				&& !(l->tipo_dado == void_d && need_int)){
-				l->last_line = l->last_line->prox = aloca_lin(node->linha);
+				l->last_line = l->last_line->prox = aloca_lin(node->linha);//declaracao encontrada insere nova linha
 				return;
 			}
 			l = l->prox;
 		}
 	} 
+	//declaracao nao encontrada
 	error = 1;
 	erro_semantico(node->key.nome, "funcao nao declarada",node->linha);
 }
 
-static void percorre_subarv_tab(tab_lines* tab, treeNode* node){
+static void percorre_subarv_tab(tab_lines* tab, treeNode* node){// percorre subarvore recursivamente
 	if(node == NULL) return;
 	unsigned char isAssing = 0;
 
-	if(node->tipo == declk && node->subTipo.decl == vari){
+	//empre q identifica um id chama a funcao apropriada para verificar erros e inserrir na tabela
+	if(node->tipo == declk && node->subTipo.decl == vari){//declaracao de varivel encontrada
 		tab->num_entradas++;
 		cuida_vari(tab, node);
-	}else if(node->tipo == expk && node->subTipo.exp == uso){
+	}else if(node->tipo == expk && node->subTipo.exp == uso){//uso de varivel encontrado
 		cuida_uso(tab, node);
-	}else if(node->tipo == expk && node->subTipo.exp == atv) {
+	}else if(node->tipo == expk && node->subTipo.exp == atv) {//ativacao de funcao encontrada
 		cuida_atv(tab, node);
 	}else if(node->tipo == expk && node->subTipo.exp == oper && node->key.op == ig && !need_int){
+		//uma atribuicao foi encontrada, filho nao pode ser funcao void
 		isAssing = 1;
 		need_int = 1;
 	}
 
+	//recursao so ocorre caso nenhum erro for identificado
 	for(int i = 0; i < MAXFILHO && !error; i++)
 		percorre_subarv_tab(tab, node->filho[i]);
-	if(isAssing) need_int = 0;
+	if(isAssing) need_int = 0;//saida da atribuicao funcoes ativadas podem ser void
 	if(!error)percorre_subarv_tab(tab, node->irmao);
 
 }
 
-static void trata_colisao_tab(tab_cols* celula){
-
-}
-
-tab_lines* create_tab(treeNode* n){
+tab_lines* create_tab(treeNode* n){// cria a tabela e faz analiza semantica
 	tab_lines* ret = (tab_lines*)malloc(sizeof(tab_lines));
 	int h_global;
-	char have_main = 0;
+	char have_main = 0;//identifica se funcao main ja foideclarada
 	tab_cols* temp;
 	treeNode* node = n;
 
 	while(node && !have_main && !error){
+	//para quando funcao main for encontrada ou quando erro for encontrado ou fim da arvore		
 
 		ret->num_entradas++;
 		h_global = hash("", node->key.nome);
 		temp = ret->linhas[h_global];
 
-		if(temp != NULL){
+		if(temp != NULL){// trata colizao de hash e declaracao repetida no escopo global
 			if(!strcmp(node->key.nome, temp->nome) && !strcmp(temp->escopo, "global0")){
 				erro_semantico(node->key.nome, "declaracao global anterior ja definida", node->linha);
 				error = 1;
@@ -259,7 +271,7 @@ tab_lines* create_tab(treeNode* n){
 			temp = ret->linhas[h_global];
 		}
 
-		if(temp->tipo_id == func_tab){
+		if(temp->tipo_id == func_tab){// caso de funcao muda escopo e percorre sub arvore
 			local_scope = temp->nome;
 			for(int i = 0; i < MAXFILHO; i++)
 				percorre_subarv_tab(ret, node->filho[i]);
@@ -272,6 +284,7 @@ tab_lines* create_tab(treeNode* n){
 
 	}
 
+	//erros envolvendo funcao main
 	if(node != NULL && !error){
 		error = 1;
 		erro_semantico(node->key.nome, "declaracao pos main", node->linha);
@@ -284,14 +297,14 @@ tab_lines* create_tab(treeNode* n){
 	return ret;
 }
 
-static void desaloca_lin(lin_t* l){
+static void desaloca_lin(lin_t* l){//desaloca lisra ligada de linhas
 	if(l == NULL) return;
 
 	desaloca_lin(l->prox);
 	free(l);
 }
 
-static void desaloca_tab(tab_cols* l){
+static void desaloca_tab(tab_cols* l){//desaloca linha da tabela
 	if(l == NULL) return;
 
 	desaloca_tab(l->prox);
@@ -302,7 +315,7 @@ static void desaloca_tab(tab_cols* l){
 
 }
 
-void destroy_tab(tab_lines* tab){
+void destroy_tab(tab_lines* tab){//percore tabela a desalocalndo
 
 		for(int i = 0, j = 0; i < TAB_SIZE && j != tab->num_entradas; i++){
 		if(tab->linhas[i] != NULL){
@@ -314,7 +327,7 @@ void destroy_tab(tab_lines* tab){
 
 }
 
-void printa_tab(tab_lines* tab){
+void printa_tab(tab_lines* tab){//percorre a tabela a printando
 	fprintf(saida, "tamanho efetivo da tabela: %d\n", tab->num_entradas);
 
 	for(int i = 0, j = 0; i < TAB_SIZE && j != tab->num_entradas; i++){
@@ -338,7 +351,6 @@ void printa_tab(tab_lines* tab){
 			}
 			fprintf(saida, "\n");
 			entrada = entrada->prox;
-			fflush(stdout);
 		}
 
 	}

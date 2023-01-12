@@ -1,6 +1,8 @@
 #ifndef MYGLOBALS_H
 #define MYGLOBALS_H
 
+//algumas variaveis e definicoes usadas em todo programa
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -2,6 +2,8 @@
 	#include "analizadorsintatico.tab.h"
 	#include "myglobals.h"
 
+	// define acao feita sempre que um token e encontrado
+	// esta acao e guardar a linha em que o token foi encontrado
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 
 	void comment();
@@ -103,11 +105,11 @@ VIRG ,
 . {fprintf(saida, "ERRO LEXICO: %s, linha: %d\n", yytext, yylineno); error = 1;}
 %%
 
-void comment(){
+void comment(){// cuida do consumo de comentarios sem identificar tokens
 
 	char c;
 	unsigned char fim = 0;
-	while(fim != 2){
+	while(fim != 2){//condicao de parada e encontrar */
 
 		c = input();
 		if(c == EOF) break;
@@ -122,7 +124,7 @@ void comment(){
 
 }
 
-void flex_end(){
+void flex_end(){// desaloca a memoria alocada pelo flex
 	yy_delete_buffer(YY_CURRENT_BUFFER);
 	yylex_destroy();
 }

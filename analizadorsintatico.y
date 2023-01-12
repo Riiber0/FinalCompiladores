@@ -38,11 +38,12 @@
 	opType op;
 	treeNode* Node;
 }
-
+//nao terminais que retornam um no da arvore
 %type <Node> programa declaracaolista declaracao vardeclaracao fundeclaracao tipoespecificador params
 %type <Node> paramlista VOID INT compostodecl param localdeclaracoes statementlista statement
 %type <Node> expressaodecl selecaodecl iteracaodecl retornodecl expressao var simplesexpressao
 %type <Node> somaexpressao termo fator ativacao args arglista
+//nao terminais que retornam um enum indicnado qual operador foi identificado
 %type <op> relacional soma multi
 
 %%
@@ -220,7 +221,7 @@ arglista : arglista VIRG expressao {treeNode* t = $1;
 
 %%
 
-int yyerror(char* msg){
+int yyerror(char* msg){// printa a linha e ultimo token encontrado
     fprintf(saida, "Erro sintatico: %s, linha: %d\n", yytext, yylloc.first_line);
 	error = 1;
     return 1;

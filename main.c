@@ -10,7 +10,7 @@ FILE *source;
 FILE* saida;
 unsigned char error = 0;
 
-treeNode* preDef(treeNode* comeco){
+treeNode* preDef(treeNode* comeco){//aloca as funções input e output no inicio da arvore
 
 	treeNode *filhoRaiz, *filhoIrmao;
 	
@@ -37,7 +37,7 @@ treeNode* preDef(treeNode* comeco){
 	return raiz;
 }
 
-void protocolo_saida(tab_lines* tab, treeNode* raiz, int status){
+void protocolo_saida(tab_lines* tab, treeNode* raiz, int status){// desaloca a memoria alocada em caso de erro
 
 	if(raiz)desaloca(raiz);
 	if(tab)destroy_tab(tab);
@@ -47,9 +47,13 @@ void protocolo_saida(tab_lines* tab, treeNode* raiz, int status){
 
 	exit(status);
 }
+/* argc = 1: saida é stdoute e entrada teclao
+argc = 2 : saida é stdout e entrada é arquivo passado em argv[1]
+argc = 3 : saida é arquivo passsado em argv[2] e entrada é arquivo passado em argv[1]*/
 
 int main(int argc, char** argv){
 
+	//aloca a saida e a entrada do programa de acordo com argumentos da main
 	if(argc == 1){
 		source = stdin;
 		saida = stdout;
@@ -76,13 +80,13 @@ int main(int argc, char** argv){
 	treeNode *raiz, *tree;
 	tab_lines* tab;
 
-    tree = parse();
+    tree = parse();// analize sintatica e lexica
 	if(error) protocolo_saida(tab, tree, EXIT_FAILURE);
 
 	raiz = preDef(tree);
 	printaArv(raiz);
 
-	tab = create_tab(raiz);
+	tab = create_tab(raiz);// analize semantica
 	if(error) protocolo_saida(tab, raiz, EXIT_FAILURE);
 
 	printa_tab(tab);

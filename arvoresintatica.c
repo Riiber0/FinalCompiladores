@@ -2,7 +2,7 @@
 #include "myglobals.h"
 #include <stdio.h>
 
-static treeNode *alocador(){
+static treeNode *alocador(){// alocador de memoria para um no
 	treeNode *ret = (treeNode*)malloc(sizeof(treeNode));
 
 	for(int i = 0; i < MAXFILHO; i++) ret->filho[i] = NULL;
@@ -12,7 +12,7 @@ static treeNode *alocador(){
 
 }
 
-treeNode* criaExp(tipoExp subt, int line){
+treeNode* criaExp(tipoExp subt, int line){// cria no do tipo expressao
 	treeNode *ret = alocador();
 
 	ret->linha = line;
@@ -22,7 +22,7 @@ treeNode* criaExp(tipoExp subt, int line){
 	return ret;
 }
 
-treeNode* criaDecl(tipoDecl subt, int line){
+treeNode* criaDecl(tipoDecl subt, int line){// cria no do tipo declaracao
 	treeNode *ret = alocador();
 
 	ret->linha = line;
@@ -32,7 +32,7 @@ treeNode* criaDecl(tipoDecl subt, int line){
 	return ret;
 }
 
-treeNode* criaEnd(tipoEnd subt, int line){
+treeNode* criaEnd(tipoEnd subt, int line){// cria no do tipo end
 	treeNode *ret = alocador();
 
 	ret->linha = line;
@@ -42,12 +42,13 @@ treeNode* criaEnd(tipoEnd subt, int line){
 	return ret;
 }
 
-void desaloca(treeNode *node){
+void desaloca(treeNode *node){// desaloca a arvore recursivamente
 	if(node == NULL) return;
 
 	for(int i = 0; i < MAXFILHO; i++) desaloca(node->filho[i]);
 	desaloca(node->irmao);
 
+	// caso o no quarde nome de um id, e precisa desalocar a string 
 	if(node->tipo == declk && (node->subTipo.decl == func || node->subTipo.decl == vari))
 		free(node->key.nome);
 	else if(node->tipo == expk && node->subTipo.exp != oper)
@@ -61,13 +62,14 @@ int ident = 0;
 #define DESIDENTAR ident--
 
 
-void prettyprint(treeNode* node){
+void prettyprint(treeNode* node){// identa a saida da arvore printando um quantidade de espacos 
+								 // de acordo com a variavel ident
 	for(int i = 0; i < ident; i++)
 		fprintf(saida, "  ");
 	fprintf(saida, "%d- ",node->linha);
 }
 
-void printa_noArv(treeNode* node){
+void printa_noArv(treeNode* node){// identifica o tipo de no o printa de acordo
 	if(node->tipo == expk && node->subTipo.exp != oper){
 		switch(node->subTipo.exp){
 			case atv:
@@ -184,7 +186,7 @@ void printa_noArv(treeNode* node){
 	fflush(stdout);
 }
 
-void printaArv(treeNode *node){
+void printaArv(treeNode *node){// percorre a arvore recursivamente e printa cada no
 	if(node == NULL) return;
 	prettyprint(node);
 		
